@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzy.base.repository.cms.CategoryDao">
+	<insert id="add" parameterType="category" useGeneratedKeys="true" keyProperty="categoryId">
+		insert into t_category  values 
+		(null,#{name},#{description},#{pcid})
+	</insert>
+	<select id="findByName" parameterType="string" resultType="category">
+		select * from t_category where name = #{name}
+	</select>
+	<select id="findNameById" parameterType="long" resultType="string">
+		select name from t_category where categoryId = #{id}
+	</select>
+</mapper>

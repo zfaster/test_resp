@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:dwr="http://www.directwebremoting.org/schema/spring-dwr"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+		http://www.directwebremoting.org/schema/spring-dwr
+    	http://www.directwebremoting.org/schema/spring-dwr-3.0.xsd">
+
+	<!-- dwr 配置 begin-->
+	<dwr:controller id="dwrController" debug="true">
+    	<dwr:config-param name="activeReverseAjaxEnabled" value="true"/>
+  	</dwr:controller>
+  	<!-- 要求DWR将util.js和engine.js映射到dwrController -->  
+  	<dwr:url-mapping />
+  	<dwr:annotation-config id="dwrAnnotationConfig" />
+  	<dwr:annotation-scan base-package="com" scanDataTransferObject="true" scanRemoteProxy="true" />
+  	<!-- dwr 配置 end -->
+  	
+  	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+  	
+	<!-- 自动扫描且只扫描@Controller -->
+	<context:component-scan base-package="com.zzy.base.controller" use-default-filters="false">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	
+	<mvc:annotation-driven/>
+		
+	<!-- 将无法mapping到Controller的path交给default servlet handler处理 -->		
+	<mvc:default-servlet-handler/>
+	
+	<mvc:resources mapping="/static/**" location="/static/" />
+	
+	<!-- 定义JSP文件的位置 --> 
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>
+	
+	<!-- 定义无Controller的path<->view直接映射 -->
+	<mvc:view-controller path="/" view-name="redirect:/index"/>
+	
+	<!-- <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+		<property name="interceptors">
+			<list>
+				<ref bean="pagerInterceptor" />
+				<ref bean="openEntityManagerInViewInterceptor" />
+			</list>
+		</property>
+	</bean> -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping  path="/chat/**"/>
+			<bean class="com.zzy.base.common.interceptor.LoginInterceptor"></bean>  
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping  path="/**"/>
+			<bean class="com.zzy.base.common.interceptor.PagerInterceptor"></bean>  
+		</mvc:interceptor>
+		
+	</mvc:interceptors>
+	
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" >  
+
+ <property name="messageConverters">   
+          <list>   
+              <bean class = "org.springframework.http.converter.StringHttpMessageConverter">   
+                 <property name = "supportedMediaTypes">
+                       <list>
+                           <value>text/html;charset=UTF-8</value>   
+                      </list>   
+                 </property>   
+              </bean>   
+          </list>   
+    </property>  
+ </bean>
+</beans>

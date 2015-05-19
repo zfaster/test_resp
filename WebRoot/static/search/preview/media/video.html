@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>video.html</title>
+	
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+    <meta http-equiv="description" content="this is my page">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    
+    <!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+    <script type="text/javascript" src="../WebPreviewer/swfobject.js"></script>
+	<script type="text/javascript" src="../ParsedQueryString.js"></script>
+  <script type="text/javascript">
+            
+            // Collect query parameters in an object that we can
+            // forward to SWFObject:
+            
+            var pqs = new ParsedQueryString();
+            var parameterNames = pqs.params(false);
+            var parameters = {
+                src: "20100809201008091621420081_WM9_256Kbps_download_PAL_ConstrainedVBR.flv",
+                //src: "",
+                autoPlay: "false",
+                verbose: true,
+                controlBarAutoHide: "false",
+                controlBarPosition: "bottom",
+                poster: "images/poster.png"
+            };
+            
+            for (var i = 0; i < parameterNames.length; i++) {
+                var parameterName = parameterNames[i];
+                parameters[parameterName] = pqs.param(parameterName) ||
+                parameters[parameterName];
+            }
+            
+            // Embed the player SWF:
+            
+            swfobject.embedSWF
+			(
+			"StrobeMediaPlayback.swf", 
+			"StrobeMediaPlayback", 
+			"100%", 
+			"100%", 
+			"10.1.0", 
+			"expressInstall.swf", 
+			parameters, 
+			{
+                allowFullScreen: "true"
+            }, 
+			{
+                name: "StrobeMediaPlayback"
+            });
+            
+            /* Uncomment this code to be notified of playback errors in JavaScript:
+            
+             function onMediaPlaybackError(playerId, code, message, detail)            
+             {
+             	alert(playerId + "\n\n" + code + "\n" + message + "\n" + detail);            
+             }
+             
+             */
+            
+        </script>
+  </head>
+  <body style="margin-top:0px;margin-right:0px;smargin-bottom:0px;margin-left:0px;" >
+  <div style="width:640px;height:480px;">
+   		<div id="StrobeMediaPlayback">
+           <p>
+               Alternative content
+           </p>
+       	</div>
+  <div>
+  </body>
+</html>

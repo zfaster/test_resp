@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"    
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/tx
+     http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+	http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd 
+	http://www.springframework.org/schema/context
+     http://www.springframework.org/schema/context/spring-context-3.0.xsd
+     http://www.springframework.org/schema/task 
+	http://www.springframework.org/schema/task/spring-task-3.0.xsd
+     http://www.springframework.org/schema/cache 
+     http://www.springframework.org/schema/cache/spring-cache.xsd">
+	<cache:annotation-driven cache-manager="cacheManager"/>
+	<!-- 扫描定时服务 -->
+	<task:annotation-driven />
+	<bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">
+		<property name="caches">
+		<set>
+			<bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" p:name="default"/>
+		</set>
+		</property>
+	</bean>
+	<context:component-scan base-package="com.zzy"></context:component-scan>
+	
+	<context:property-placeholder location="classpath:jdbc.properties,classpath:redis.properties"/>
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" value="${driverClass}"/>
+		<property name="jdbcUrl" value="${jdbcUrl}"/>
+		<property name="user" value="${user}"/>
+		<property name="password" value="${password}"/>
+		<!-- 初始化时获取的连接数，取值应在minPoolSize与maxPoolSize之间。Default: 3  -->
+		<property name="initialPoolSize" value="1"/>
+		<!-- 连接池中保留的最小连接数。 -->
+		<property name="minPoolSize" value="1"/>	
+		<!-- 连接池中保留的最大连接数。Default: 15  -->
+		<property name="maxPoolSize" value="300"/>
+		<!-- 最大空闲时间,60秒内未使用则连接被丢弃。若为0则永不丢弃。Default: 0  -->
+		<property name="maxIdleTime" value="60"/>	
+		<!-- 当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。Default: 3  -->
+		<property name="acquireIncrement" value="5"/>	
+		<!-- 每60秒检查所有连接池中的空闲连接。Default: 0  -->
+		<property name="idleConnectionTestPeriod" value="60"/>
+	</bean>
+	
+	
+	<!-- MyBatis配置 -->
+	<bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<!-- 自动扫描entity目录, 省掉Configuration.xml里的手工配置 -->
+		<property name="typeAliasesPackage" value="com.zzy.base.entity" />
+		<!-- 显式指定Mapper文件位置 -->
+		<property name="mapperLocations" value="classpath:/mybatis/*Mapper.xml" />
+	</bean>
+	<!-- 扫描basePackage下所有以@MyBatisRepository标识的 接口-->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.zzy.base.repository" />
+		<property name="annotationClass" value="com.zzy.base.repository.MyBatisRepository"/>
+	</bean>
+	
+	<bean id="txManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<tx:advice id="txAdvise" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="find*" read-only="true" />
+			<tx:method name="get*" read-only="true" />
+			<tx:method name="*" propagation="REQUIRED" />
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<aop:pointcut expression="execution(public * com.zzy.base.service..*.*(..))"
+			id="service" />
+		<aop:advisor advice-ref="txAdvise" pointcut-ref="service" />
+	</aop:config>
+
+	<tx:annotation-driven transaction-manager="txManager" />
+	 
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate" scope="prototype">
+    	<constructor-arg index="0" ref="sessionFactory"/>
+  	</bean>
+	<bean class="com.zzy.mybatis.mapperhelper.MapperHelper"
+        depends-on="sqlSession" init-method="initMapper" scope="singleton" lazy-init="false">
+	    <!--通用Mapper接口-->
+	    <property name="mappers">
+	      <array>
+	        <value>com.zzy.mybatis.mapper.Mapper</value>
+	      </array>
+	    </property>
+	    <!--必须注入sqlSession-->
+	    <property name="sqlSessions" ref="sqlSession"/>
+	    <!--对于一般的getAllIfColumnNode，是否判断!=''，默认不判断-->
+	    <!--该参数会影响所有使用getAllIfColumnNode方法的地方-->
+	    <!--具体到Mapper<T>,影响3个方法：select,selectCount,delete-->
+	    <property name="notEmpty" value="true"/>
+	    <property name="IDENTITY" value="MYSQL"/>
+  	</bean>
+
+	<bean id="registry" class="org.springframework.remoting.rmi.RmiRegistryFactoryBean">   
+       <property name="port" value="1099"/>   
+    </bean>   
+	<!-- <bean class="org.springframework.remoting.rmi.RmiServiceExporter">
+		<property name = "serviceName" value = "HelloService" />   
+        <property name = "service" ref = "helloService" />   
+        <property name = "serviceInterface" value = "com.zzy.base.service.HelloService" />   
+        <property name="registryPort" value="1099"/>   
+        <property name="registry" ref="registry"/>   
+	</bean> -->
+	
+	<!-- <bean id="serviceClient" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">    
+        <property name="serviceUrl" value="rmi://127.0.0.1:1099/HelloService" />   
+        <property name="serviceInterface" value="com.zzy.base.service.HelloService" />    
+         <property name="lookupStubOnStartup" value="false"/>   
+        <property name="refreshStubOnConnectFailure" value="true"/>  
+        <property name="cacheStub" value="false"/>   
+    </bean>  -->
+    
+    <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">  
+        <property name="maxIdle" value="${redis.maxIdle}" />  
+        <!-- <property name="maxActive" value="${redis.maxActive}" />  
+        <property name="maxWait" value="${redis.maxWait}" />   -->
+        <property name="testOnBorrow" value="${redis.testOnBorrow}" />  
+    </bean>  
+      
+    <bean id="connectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"  
+        p:host-name="${redis.host}" p:port="${redis.port}" p:password="${redis.pass}"  p:pool-config-ref="poolConfig"/>  
+      
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">  
+        <property name="connectionFactory"   ref="connectionFactory" />  
+    </bean>
+    <!-- 在线用户管理实现 -->
+    <bean id="onlineUserManager" class="com.zzy.base.common.manager.impl.OnlineUserManagerClusterImpl" />  
+</beans>

@@ -1,0 +1,21 @@
+
+h1 {
+	font-size: 30px;
+	font-weight: bold;
+	font-family: Arial;
+}
+
+h1 span {
+	font-size: 50%;
+	letter-spacing: -0.05em;
+}
+
+hr {
+	border: none;
+	height: 1px; line-height: 1px;
+	background: #E5E5E5;
+	margin-bottom: 20px;
+	padding: 0;
+}
+
+

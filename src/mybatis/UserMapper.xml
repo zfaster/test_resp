@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzy.base.repository.chat.UserDao">
+		<insert id="add" parameterType="user">
+		insert into t_user values 
+		(#{userId},#{username},#{password},#{type})
+		</insert>	
+		<select id="findById" parameterType="int" resultType="user">
+			select * from t_user where userid = #{id}
+		</select>
+		<select id="findList"  resultType="user">
+			select * from t_user 
+		</select>
+		<select id="login"  resultType="user">
+			select * from t_user where username = #{username} and password = #{password} and type = #{type}
+		</select>
+		<select id="findUserByType" parameterType="short"  resultType="user">
+			select * from t_user where type = #{type}
+		</select>
+		
+</mapper>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC " -//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzy.base.repository.order.PersonDao">
+			
+			<resultMap type="person" id="personMapper">
+				<id column="pid" property="pid"/>
+				<result column="name" property="name"/>
+				<collection property="orders" ofType="order" column="pid">
+					<id column="oid" property="oid"/>
+					<result column="price" property="price"/>
+				</collection>
+			</resultMap>
+			<select id="findById" parameterType="long" resultMap="personMapper">
+				select o.*,p.* from t_order o,t_person p where o.pid = p.pid and p.pid=#{id};
+			</select>
+			<delete id="deleteById" >
+				delete from t_person where pid in 
+				
+				<foreach item="item" index="index" collection="array"
+				open="(" separator="," close=")">
+				#{item}
+				</foreach>
+			</delete>
+			
+</mapper>

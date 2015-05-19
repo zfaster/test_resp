@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzy.base.repository.chat.ChatLogDao">
+		<select id="getNoFinishedChat" resultType="chatLog">
+		
+			select * from t_chatlog where endTime is null 
+				<if test="userId != null">
+				  and userid = #{userId}
+				</if>
+				<if test="serverId != null">
+					 and serverId = #{serverId}
+				</if>
+			
+		</select>
+</mapper>

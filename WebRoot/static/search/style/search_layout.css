@@ -1,0 +1,67 @@
+@charset "utf-8";
+html {
+	height:100%;
+}
+body {
+	max-height:100%;
+	height:100%;
+	margin:0;
+	padding:0;
+	margin:0;
+	border:0;
+	font-size:12px;
+	line-height:24px;
+}
+form {
+	margin:0;
+	padding:0;
+}
+img {
+	border:0;
+	height:auto;
+}
+ul, ol, li {
+	margin:0;
+	padding:0;
+	list-style:none;
+}
+a {
+	color:#1e50a2;
+	text-decoration:underline;
+	cursor:pointer;
+	border:0;
+}
+a:hover {
+	color:#1e50a2;
+	text-decoration:underline;
+}
+body, td, select, input, textarea {
+	color:#000;
+	font-family:"宋体",Verdana;
+}
+h1, h2, h3, h4, h5, h6 {
+	font-size:100%;
+	margin:0;
+	padding:0;
+}
+.highlight{
+	color: red
+}
+div, p, blockquote, dl, dt, dd, tr, th, td, center, input, button, textarea{padding:0;margin:0}
+button,input,select,textarea{ font-size:12px;}
+
+.clearfix:after{ content:""; height:0; visibility:hidden; display:block; clear:both;}
+.clearfix{ zoom:1;}
+
+.clear {
+	clear:both;
+}
+.fleft {
+	float:left;
+}
+.fright {
+	float:right;
+}
+.Gray{
+	color:#999;
+}
